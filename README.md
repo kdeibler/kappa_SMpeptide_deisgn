@@ -22,14 +22,23 @@ The code provided in this paper was run on a 2018 Rosetta version. If you want t
 3. Open Babel (http://openbabel.org/wiki/Main_Page)
 4. Jupyter Notebook (only required to run the demo for Docking analysis)
 
-# Protocols
-This folder contains subdirectories with code and detailed isntruction on how to run each of four design methods. Below is a brief description of what each folder contains
+# Rosetta Design Protocols
+This folder contains subdirectories with code and detailed isntruction on how to run each step design methods. Below is a brief description of what each folder contains
 
-## general_files
+### src
+Contains main scripts for backbone generation and design
+
+### inputs
 Includes all the files that are used in more than one folder:
 1. resfiles
 2. params file for CVV and CYY
 3. composition files
 
-# Output
+### submission files
+slurm based 
+
+## Output
 Because the processes of design and packing are stochastic, the output files can vary from run to run. Each step as an output of either a PDB file or a silent file.
+
+# Molecular Dynamic methods
+This folder contains subdirectories with code for performing the molecular dynamic simulations.

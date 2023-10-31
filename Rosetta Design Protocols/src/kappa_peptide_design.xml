@@ -1,0 +1,233 @@
+<ROSETTASCRIPTS> 
+
+#########################################################################
+### This script is meant to design sequence on to a backbone scaffold ###
+### in the binding pocket of the protein/receptor of interest.        ### 
+#########################################################################
+
+    <SCOREFXNS> 
+
+        <ScoreFunction name="ref" weights="ref2015"/> 
+
+        <ScoreFunction name="ref_cst" weights="ref2015"> 
+            <Reweight scoretype="coordinate_constraint" weight="1" /> 
+            <Reweight scoretype="atom_pair_constraint" weight="1" /> 
+            <Reweight scoretype="dihedral_constraint" weight="1" /> 
+            <Reweight scoretype="angle_constraint" weight="1" /> 
+        </ScoreFunction> 
+
+        <ScoreFunction name="ref_comp" weights="ref2015" > 
+            <Reweight scoretype="coordinate_constraint" weight="1" /> 
+            <Reweight scoretype="atom_pair_constraint" weight="1" /> 
+            <Reweight scoretype="dihedral_constraint" weight="1" /> 
+            <Reweight scoretype="angle_constraint" weight="1" /> 
+            <Reweight scoretype="aa_composition" weight="1" /> 
+        </ScoreFunction>      
+
+    </SCOREFXNS> 
+
+    <RESIDUE_SELECTORS> 
+
+        <Chain name="protein" chains="A"/> 
+        <Chain name="peptide" chains="B" />
+
+        <Phi name="posPhi" select_positive_phi="true" /> 
+        <And name="posPhi_B" selectors="peptide,posPhi" /> 
+        <Phi name="negPhi" select_positive_phi="false" /> 
+        <And name="negPhi_B" selectors="peptide,negPhi" /> 
+
+        <Neighborhood name="interface_chB" selector="peptide" distance="8.0"/> 
+        <Neighborhood name="interface_chA" selector="protein" distance="8.0"/> 
+        <And name="AB_interface" selectors="interface_chB,interface_chA"/> 
+
+        <ResidueName name="stub_sel" residue_name3="CYY,DPH"/> 
+
+    </RESIDUE_SELECTORS> 
+
+ 
+
+    <TASKOPERATIONS> 
+
+        <ReadResfile name="l_res" filename="l_res.txt" selector="negPhi"/> 
+        <ReadResfile name="d_res" filename="d_res.txt" selector="posPhi"/> 
+
+        <OperateOnResidueSubset name="no_design_stub" selector="stub_sel"> 
+            <RestrictToRepackingRLT/> 
+        </OperateOnResidueSubset> 
+
+        <OperateOnResidueSubset name="only_repack_chain" selector="protein"> 
+            <RestrictToRepackingRLT/> 
+        </OperateOnResidueSubset> 
+
+        <DisallowIfNonnative name="no_cys" disallow_aas="CG"/> 
+
+        <OperateOnResidueSubset name="no_repack_except_interface" > 
+            <And> 
+                <Chain chains="1"/> 
+                <Not> 
+                    <Neighborhood distance="8.0" > 
+                        <Chain chains="2"/> 
+                    </Neighborhood> 
+                </Not> 
+            </And> 
+            <PreventRepackingRLT /> 
+        </OperateOnResidueSubset> 
+
+        <IncludeCurrent name="current"/> 
+
+        <OperateOnResidueSubset name="restrict_to_interface" selector="AB_interface"> 
+            <RestrictToRepackingRLT/> 
+        </OperateOnResidueSubset>  
+
+    </TASKOPERATIONS> 
+
+ 
+
+    <FILTERS> 
+
+        <ScoreType name="score" 
+        	scorefxn="ref" 
+        	score_type="total_score" 
+        	threshold="50" /> 
+
+        <ResidueCount name="gly_count" 
+        	max_residue_count="2" 
+        	min_residue_count="0" 
+        	residue_types="GLY" 
+        	count_as_percentage="0"/> 
+
+        <ShapeComplementarity name="sc_filter" 
+        	verbose="0" 
+        	write_int_area="1" 
+        	jump="1" 
+        	confidence="0"/>
+
+        <AtomicContactCount name="interface_contactcount" 
+        	task_operations="restrict_to_interface" 
+        	confidence="0"/> 
+         
+        <Ddg name="ddg"  
+        	threshold="10" 
+        	jump="1" 
+        	repeats="5" 
+        	repack="1" 
+        	confidence="1" 
+        	scorefxn="ref"/>
+
+        <Ddg name="ddg_norepack"  
+        	threshold="15" 
+        	jump="1" 
+        	repeats="1" 
+        	repack="0" 
+        	confidence="1" 
+        	scorefxn="ref"/> 
+ 
+        <Sasa name="interface_buried_sasa" 
+        	confidence="0"/> 
+
+        <Sasa name="interface_hydrophobic_sasa" 
+        	confidence="0" 
+        	hydrophobic="True"/> 
+
+        <Sasa name="interface_polar_sasa" 
+        	confidence="0" 
+        	polar="True"/> 
+
+        <BuriedUnsatHbonds name="new_buns_bb_heavy"  
+        	ignore_surface_res="true" 
+        	report_bb_heavy_atom_unsats="true" 
+        	scorefxn="ref" 
+        	confidence="0" 
+        	print_out_info_to_pdb="true" /> 
+
+        <BuriedUnsatHbonds name="new_buns_sc_heavy" 
+        	ignore_surface_res="true" 
+        	report_sc_heavy_atom_unsats="true" 
+        	scorefxn="ref" 
+        	confidence="0" 
+        	print_out_info_to_pdb="true" /> 
+  
+        <AtomicDistance name="distancefilter" 
+        	residue1="288" 
+        	atomname1="CZ" 
+        	residue2="84" 
+        	atomname2="CG1" 
+        	distance="8"/> 
+
+    </FILTERS> 
+
+    <MOVERS>         
+
+        <DeclareBond name="bond" res1="286" atom1="CE" res2="282" atom2="N" add_termini="false"/> 
+
+        <CreateTorsionConstraint name="peptide_torsion_constraints"> 
+            <Add res1="286" res2="286" res3="282" res4="282" atom1="CD" atom2="CE" atom3="N" atom4="CA" cst_func="CIRCULARHARMONIC 3.141592654 0.005"/> 
+        </CreateTorsionConstraint> 
+ 
+        <CreateAngleConstraint name="peptide_angle_constraints"> 
+            <Add res1="286" atom1="CD" res_center="286" atom_center="CE" res2="282" atom2="N" cst_func="CIRCULARHARMONIC 2.02807247 0.005" /> 
+            <Add res1="286" atom1="CE" res_center="282" atom_center="N" res2="282" atom2="CA" cst_func="CIRCULARHARMONIC 2.14675 0.005" /> 
+        </CreateAngleConstraint> 
+ 
+        <CreateDistanceConstraint name="distance_constraints"> 
+            <Add res1="286" res2="282" atom1="CE" atom2="N" cst_func="HARMONIC 1.33 0.01" /> 
+        </CreateDistanceConstraint> 
+ 
+        <FastDesign name="design" task_operations="d_res,l_res,only_repack_chain,no_repack_except_interface,no_design_stub,no_cys,current" scorefxn="ref_comp" repeats="3" ramp_down_constraints="false"> 
+            <MoveMap name="specifics"> 
+                <Jump number="1" setting="0" /> 
+                <Span begin="1" end="281" chi="0" bb="0"/> 
+            </MoveMap> 
+        </FastDesign> 
+ 
+        <FastRelax name="relax" scorefxn="ref_cst" repeats="2" ramp_down_constraints="false"> 
+            <MoveMap name="specifics"> 
+                <Jump number="1" setting="0" /> 
+                <Span begin="1" end="281" chi="0" bb="0"/> 
+            </MoveMap> 
+        </FastRelax> 
+
+    </MOVERS> 
+
+     
+
+    <APPLY_TO_POSE> 
+
+    </APPLY_TO_POSE> 
+
+    
+
+    <PROTOCOLS> 
+
+        <Add mover="bond" /> 
+        <Add mover="peptide_torsion_constraints" /> 
+        <Add mover="peptide_angle_constraints" /> 
+        <Add mover="distance_constraints" />
+
+        <Add mover="design"/>
+
+        <Add mover="bond" /> 
+        <Add mover="peptide_torsion_constraints" /> 
+        <Add mover="peptide_angle_constraints" /> 
+        <Add mover="distance_constraints" />
+
+        <Add mover="relax" />
+
+        <Add filter_name="distancefilter"/> 
+        <Add filter="new_buns_bb_heavy"/> 
+        <Add filter="new_buns_sc_heavy"/> 
+    	<Add filter="sc_filter" /> 
+    	<Add filter="interface_contactcount"/> 
+    	<Add filter="ddg"/> 
+    	<Add filter="ddg_norepack"/> 
+    	<Add filter="interface_buried_sasa"/> 
+    	<Add filter="interface_hydrophobic_sasa"/> 
+    	<Add filter="interface_polar_sasa"/> 
+
+    </PROTOCOLS> 
+
+    
+
+    <OUTPUT /> 
+
+</ROSETTASCRIPTS> 

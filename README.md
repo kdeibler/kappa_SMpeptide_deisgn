@@ -29,12 +29,9 @@ This folder contains subdirectories with code and detailed isntruction on how to
 Contains main scripts for backbone generation and design
 
 1_thioether_backbone.py
-> Run command: python thioether_backbone.py <cycle_size> <number_of_structures>
-> Example run: python thioether_backbone.py 6 10000
-
-2_docking_protocol.py
-
-3_kappa_peptide_design.xml
+2_peptide_utils.py
+3_docking_protocol.py
+4_kappa_peptide_design.xml
 
 ### _inputs
 Includes all the files that are used in more than one folder:

@@ -29,7 +29,7 @@ This folder contains subdirectories with code and detailed isntruction on how to
 Contains main scripts for backbone generation and design
 
 1_thioether_backbone.py
-> Run command: python thioether_backbone.py <cycle_size> <number_of_structures> ###
+> Run command: python thioether_backbone.py <cycle_size> <number_of_structures>
 > Example run: python thioether_backbone.py 6 10000
 
 2_docking_protocol.py
@@ -41,9 +41,6 @@ Includes all the files that are used in more than one folder:
 1. resfiles
 2. params file for CVV and CYY
 3. composition files
-
-### submission files
-slurm based 
 
 ## Output
 Because the processes of design and packing are stochastic, the output files can vary from run to run. Each step as an output of either a PDB file or a silent file.

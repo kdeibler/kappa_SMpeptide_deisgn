@@ -28,7 +28,7 @@ This folder contains subdirectories with code and detailed isntruction on how to
 ### src
 Contains main scripts for backbone generation and design
 
-### inputs
+### _inputs
 Includes all the files that are used in more than one folder:
 1. resfiles
 2. params file for CVV and CYY

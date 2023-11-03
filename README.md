@@ -50,7 +50,6 @@ This folder contains subdirectories with code for performing the molecular dynam
 
 ## General requirements
 ### Packages and softwares
-Include the following: 
 1. AMBER22
 2. AmberTool23
 3. VMD 

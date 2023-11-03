@@ -1,0 +1,16 @@
+ heating 310K
+ &cntrl
+   imin=0, ntx=5, irest=1, 
+   ntc=2, ntf=2,tol=0.0000001,
+   nstlim=500000, ntt=3, gamma_ln=1.0, 
+   ntr=1, ig=-1,
+   ntpr=100, ntwr=1000,ntwx=100,
+   dt=0.002,nmropt=1,
+   ntb=2,taup=2.0,cut=10.0,ioutfm=1,ntxo=2,
+   ntp=2,
+   restraint_wt=5.0, restraintmask='!:WAT,Na+,K+,Cl-',
+ /
+ &wt type='TEMP0', istep1=0, istep2=500000,
+                   value1=310.0, value2=310.0 /
+ &wt type='END'
+
